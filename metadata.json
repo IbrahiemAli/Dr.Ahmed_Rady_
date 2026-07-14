@@ -1,0 +1,6 @@
+{
+  "name": "Dr. Ahmed Rady - Legal English Platform",
+  "description": "A professional Arabic-first bilingual (AR/EN) e-learning platform specializing in Legal English courses by Dr. Ahmed Rady.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
