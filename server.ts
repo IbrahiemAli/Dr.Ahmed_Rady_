@@ -196,8 +196,20 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares to accept JSON and File Uploads (base64 handled directly)
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use((req: any, res, next) => {
+  if (req.body && typeof req.body === 'object') {
+    next();
+  } else {
+    express.json({ limit: '50mb' })(req, res, next);
+  }
+});
+app.use((req: any, res, next) => {
+  if (req.body && typeof req.body === 'object') {
+    next();
+  } else {
+    express.urlencoded({ extended: true, limit: '50mb' })(req, res, next);
+  }
+});
 
 // Intercept and block response termination until pending Supabase DB writes are fully flushed to the cloud database
 app.use((req, res, next) => {
@@ -240,11 +252,14 @@ app.use(async (req, res, next) => {
 
   // Auth Endpoints
   app.post('/api/auth/login-admin', (req, res) => {
-    const { email, password } = req.body;
-    if (email === 'info.dr.ahmed.rady@gmail.com' && (password === 'MNBvcx888@' || password === 'MNBvcx888')) {
-      return res.json({ success: true, token: 'admin-super-token', user: { email, role: 'admin', name: 'أ. د. أحمد راضي' } });
+    const { email, password } = req.body || {};
+    const finalEmail = (email || req.query.email || '').toString().trim();
+    const finalPassword = (password || req.query.password || '').toString();
+
+    if (finalEmail === 'info.dr.ahmed.rady@gmail.com' && (finalPassword === 'MNBvcx888@' || finalPassword === 'MNBvcx888')) {
+      return res.json({ success: true, token: 'admin-super-token', user: { email: finalEmail, role: 'admin', name: 'أ. د. أحمد راضي' } });
     }
-    console.log('Failed login attempt:', { email, password });
+    console.log('Failed login attempt:', { email: finalEmail });
     res.status(401).json({ error: 'بيانات الاعتماد غير صالحة. لا يمكن الوصول إلا للمسؤول / Invalid credentials. Admin access only.' });
   });
 
